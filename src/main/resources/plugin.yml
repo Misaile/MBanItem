@@ -1,0 +1,11 @@
+name: MBanItem
+main: com.misaile256.mbanitem.MBanItem
+version: 1.0b
+author: Misaile
+commands:
+ mbanitem:
+  aliases: [mbi,bi]
+ mbanlist:
+  aliases: [mbilist,mbanlist,banlist,blist]
+
+ 
