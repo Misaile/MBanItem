@@ -1,44 +1,36 @@
 package com.misaile256.mbanitem;
 
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
-import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import com.misaile256.mbanitem.config.BlackItemConfig;
+import com.misaile256.mbanitem.command.MBanItemCommandTabExecutor;
+import com.misaile256.mbanitem.configuration.BlackItemConfig;
+import com.misaile256.mbanitem.configuration.Config;
 
 public class MBanItem extends JavaPlugin {
 	private static MBanItem instance;
+	private Config config;
 	private BlackItemConfig blackItemConfig;
-	private String dataFolderPath;
 
 	@Override
 	public void onLoad() {
 		saveDefaultConfig();
-		dataFolderPath = getDataFolder().getPath();
+
 	}
 
 	@Override
 	public void onEnable() {
-		if (getConfig().getBoolean("settings.enable")) {
+		getLogger().info("Author : Misaile");
+		getLogger().info("如果有bug之类的,请联系作者邮箱laciam@qq.com");
+		if (super.getConfig().getBoolean("settings.enable")) {
 			instance = this;
-			blackItemConfig = BlackItemConfig.loadBlackItemConfig(dataFolderPath + "\\black-item.xml");
-			getServer().getPluginCommand("mbanitem").setExecutor(new MBanItemCommand());
-			getServer().getPluginCommand("mbanlist").setExecutor(new CommandExecutor() {
-				@Override
-				public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
-					if (sender instanceof Player) {
-						Player player = (Player) sender;
-						MCommand.openBanViewMenu(player);
-					}
-					return false;
-				}
-			});
-			getServer().getPluginManager().registerEvents(new MCommand().new MenuClickListener(), instance);
-			InventoryListener.registerBanItemEventListener();
+			Config.loadConfig(this);
+			getServer().getPluginManager().registerEvents(new MBanItemListener(), this);
+			MBanItemCommandTabExecutor mbicte = new MBanItemCommandTabExecutor();
+			getServer().getPluginCommand("mbanitem").setExecutor(mbicte);
+			getServer().getPluginCommand("mbanitem").setTabCompleter(mbicte);
+			blackItemConfig = new BlackItemConfig("black-item");
 		}
-		getLogger().info("enable = " + getConfig().getBoolean("settings.enable"));
+		getLogger().info("enable = " + super.getConfig().getBoolean("settings.enable"));
 
 	}
 
@@ -50,11 +42,12 @@ public class MBanItem extends JavaPlugin {
 		return instance;
 	}
 
-	public BlackItemConfig getBlackItemConfig() {
-		return this.blackItemConfig;
+	public Config getConfiguration() {
+		return config;
 	}
 
-	public String getDataFolderPath() {
-		return dataFolderPath;
+	public BlackItemConfig getBlackItemConfig() {
+		return blackItemConfig;
 	}
+
 }
